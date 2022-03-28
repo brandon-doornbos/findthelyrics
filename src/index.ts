@@ -38,8 +38,16 @@ export async function find(query_string: string): Promise<string> {
                         }
                     }).then((response) => {
                         const $ = cheerio.load(response.body);
-                        if ($("div[data-lyrics-container|=true]").text()) {
-                            resolve($("div[data-lyrics-container|=true]").text());
+                        let data = $("div[data-lyrics-container|=true]");
+                        if (data.text()) {
+                            let lyrics = "";
+
+                            data.each((i, elem) => {
+                                lyrics += cheerio.load(cheerio.load(elem).html().replace(/<br>/gi, "\n")).text();
+                                lyrics += "\n";
+                            });
+
+                            resolve(lyrics);
                         } else {
                             var mm = "https://www.musixmatch.com/search/" + q;
                             got(mm, {
