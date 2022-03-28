@@ -2,7 +2,7 @@ const ftl = require("../");
 
 var q = "Fitz and The Tantrums I Just Wanna Shine";
 
-ftl.find(q ,function(err, resp) {
+ftl.find(q, function (err, resp) {
     if (!err) {
         console.log(resp)
     } else {

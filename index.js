@@ -3,12 +3,12 @@ const cheerio = require("cheerio");
 
 exports.find = (query_string, cb) => {
     if (!query_string | !cb) {
-        cb({"message": "Callbacks and variables are required.", "code": "notAllVars"});
+        cb({ "message": "Callbacks and variables are required.", "code": "notAllVars" });
         return;
     }
     var q = encodeURI(query_string).replace(" ", "+");
     var url = "https://genius.com/api/search/song?page=1&q=" + q;
-    got(url,{
+    got(url, {
         headers: {
             "Host": "genius.com",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
@@ -20,7 +20,7 @@ exports.find = (query_string, cb) => {
             "DNT": "1",
             "TE": "Trailers"
         }
-    }).then(function(response){
+    }).then(function (response) {
         if (JSON.parse(response.body).response.sections[0].hits[0]) {
             var data_url = "https://genius.com" + JSON.parse(response.body).response.sections[0].hits[0].result.path;
             setTimeout(function () {
@@ -36,7 +36,7 @@ exports.find = (query_string, cb) => {
                         "DNT": "1",
                         "TE": "Trailers"
                     }
-                }).then(function(response) {
+                }).then(function (response) {
                     var $ = cheerio.load(response.body);
                     if ($(".song_body-lyrics p").text()) {
                         cb(null, $(".song_body-lyrics p").text());
@@ -55,14 +55,14 @@ exports.find = (query_string, cb) => {
                                 "DNT": "1",
                                 "Cache-Control": "max-age=0"
                             }
-                        }).then(function(response) {
+                        }).then(function (response) {
                             var $ = cheerio.load(response.body);
                             if (!$(".media-card-title a")[0]) {
-                                cb({code:"noData",message:"There was no data available for your query.", suggestion: "Make sure you spelled the query correctly."}, null);
+                                cb({ code: "noData", message: "There was no data available for your query.", suggestion: "Make sure you spelled the query correctly." }, null);
                                 return;
                             }
                             var mm2 = "https://www.musixmatch.com" + $(".media-card-title a")[0].attribs.href;
-                            got(mm2,  {
+                            got(mm2, {
                                 headers: {
                                     "Host": "www.musixmatch.com",
                                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
@@ -76,26 +76,26 @@ exports.find = (query_string, cb) => {
                                     "Cache-Control": "max-age=0",
                                     "TE": "Trailers"
                                 }
-                            }).then(function(response) {
+                            }).then(function (response) {
                                 var $ = cheerio.load(response.body);
                                 if ($(".mxm-lyrics .lyrics__content__ok")) {
                                     var lyrics = $(".mxm-lyrics .lyrics__content__ok").text();
                                     cb(null, lyrics)
                                 } else {
-                                    cb({code:"noData",message:"There was no data available for your query.", suggestion: "Make sure you spelled the query correctly."}, null);
+                                    cb({ code: "noData", message: "There was no data available for your query.", suggestion: "Make sure you spelled the query correctly." }, null);
                                 }
                             })
-                        }).catch(function(e) {
+                        }).catch(function (e) {
                             cb(e, null)
                         })
                     }
-                }).catch(function(e) {
+                }).catch(function (e) {
                     cb(e, null)
                 })
             }, 1500);
         } else {
-            var d ="https://www.musixmatch.com/search/" + q
-            got(d, { 
+            var d = "https://www.musixmatch.com/search/" + q
+            got(d, {
                 headers: {
                     "Host": "www.musixmatch.com",
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
@@ -107,15 +107,15 @@ exports.find = (query_string, cb) => {
                     "Upgrade-Insecure-Requests": "1",
                     "DNT": "1",
                     "Cache-Control": "max-age=0"
-                }  
-            }).then(function(response) {
+                }
+            }).then(function (response) {
                 var $ = cheerio.load(response.body);
                 if (!$(".media-card-title a")[0].attribs.href) {
-                    cb({code:"noResults",message:"There was no results for your query.", suggestion: "Make sure you spelled the query correctly."}, null);
+                    cb({ code: "noResults", message: "There was no results for your query.", suggestion: "Make sure you spelled the query correctly." }, null);
                     return;
                 }
                 var mm2 = "https://www.musixmatch.com" + $(".media-card-title a")[0].attribs.href;
-                got(mm2,  {
+                got(mm2, {
                     headers: {
                         "Host": "www.musixmatch.com",
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
@@ -129,16 +129,16 @@ exports.find = (query_string, cb) => {
                         "Cache-Control": "max-age=0",
                         "TE": "Trailers"
                     }
-                }).then(function(response) {
+                }).then(function (response) {
                     var $ = cheerio.load(response.body);
                     if ($(".mxm-lyrics .lyrics__content__ok")) {
                         var lyrics = $(".mxm-lyrics .lyrics__content__ok").text();
                         cb(null, lyrics)
                     } else {
-                        cb({code:"noData",message:"There was no data available for your query.", suggestion: "Make sure you spelled the query correctly."}, null);
+                        cb({ code: "noData", message: "There was no data available for your query.", suggestion: "Make sure you spelled the query correctly." }, null);
                     }
                 })
-            }).catch(function(e) {
+            }).catch(function (e) {
                 cb(e, null)
             })
         }
