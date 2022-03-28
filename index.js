@@ -1,7 +1,7 @@
-const got = require("got");
-const cheerio = require("cheerio");
+import { default as got } from "got";
+import * as cheerio from "cheerio";
 
-exports.find = (query_string, cb) => {
+export async function find(query_string, cb) {
     if (!query_string | !cb) {
         cb({ "message": "Callbacks and variables are required.", "code": "notAllVars" });
         return;

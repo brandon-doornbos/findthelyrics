@@ -1,4 +1,4 @@
-const ftl = require("../");
+import * as ftl from "../index.js";
 
 var q = "Fitz and The Tantrums I Just Wanna Shine";
 
