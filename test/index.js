@@ -1,4 +1,4 @@
-import * as ftl from "../index.js";
+import * as ftl from "../dist/index.js";
 
 var q = "Fitz and The Tantrums I Just Wanna Shine";
 

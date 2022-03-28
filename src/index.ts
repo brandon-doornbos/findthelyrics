@@ -1,7 +1,7 @@
 import { default as got } from "got";
 import * as cheerio from "cheerio";
 
-export async function find(query_string, cb) {
+export async function find(query_string: string): Promise<string> {
     return new Promise((resolve, reject) => {
         if (!query_string)
             reject("Query string required.");
@@ -37,7 +37,7 @@ export async function find(query_string, cb) {
                             "TE": "Trailers"
                         }
                     }).then((response) => {
-                        var $ = cheerio.load(response.body);
+                        const $ = cheerio.load(response.body);
                         if ($("div[data-lyrics-container|=true]").text()) {
                             resolve($("div[data-lyrics-container|=true]").text());
                         } else {
