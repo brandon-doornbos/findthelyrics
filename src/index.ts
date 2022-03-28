@@ -117,7 +117,7 @@ export async function find(query_string: string): Promise<string> {
                     }
                 }).then((response) => {
                     var $ = cheerio.load(response.body);
-                    if (!$(".media-card-title a")[0].attribs.href)
+                    if (!$(".media-card-title a")[0]))
                         reject("There were no results for your query. (Make sure you spelled the query correctly)");
 
                     var mm2 = "https://www.musixmatch.com" + $(".media-card-title a")[0].attribs.href;
