@@ -38,8 +38,8 @@ export async function find(query_string, cb) {
                         }
                     }).then((response) => {
                         var $ = cheerio.load(response.body);
-                        if ($(".song_body-lyrics p").text()) {
-                            cb(null, $(".song_body-lyrics p").text());
+                        if ($("div[data-lyrics-container|=true]").text()) {
+                            resolve($("div[data-lyrics-container|=true]").text());
                         } else {
                             var mm = "https://www.musixmatch.com/search/" + q;
                             got(mm, {
