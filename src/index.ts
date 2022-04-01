@@ -1,153 +1,53 @@
-import { default as got } from "got";
 import * as cheerio from "cheerio";
 
-export async function find(query_string: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        if (!query_string)
-            reject("Query string required.");
+export async function find_lyrics(query_string: string): Promise<string | Error> {
+    if (!query_string)
+        return new Error("Query string required.");
 
-        var q = encodeURI(query_string).replace(" ", "+");
-        var url = "https://genius.com/api/search/song?page=1&q=" + q;
-        got(url, {
-            headers: {
-                "Host": "genius.com",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Language": "en-US,en;q=0.5",
-                "X-Requested-With": "XMLHttpRequest",
-                "Connection": "keep-alive",
-                "Referer": "https://genius.com/search?q=" + q,
-                "DNT": "1",
-                "TE": "Trailers"
-            }
-        }).then((response) => {
-            if (JSON.parse(response.body).response.sections[0].hits[0]) {
-                var data_url = "https://genius.com" + JSON.parse(response.body).response.sections[0].hits[0].result.path;
-                setTimeout(() => {
-                    got(data_url, {
-                        headers: {
-                            "Host": "genius.com",
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                            "Accept-Language": "en-US,en;q=0.5",
-                            "Accept-Encoding": "gzip, deflate, br",
-                            "Connection": "keep-alive",
-                            "Referer": "https://genius.com/search?q=" + q,
-                            "DNT": "1",
-                            "TE": "Trailers"
-                        }
-                    }).then((response) => {
-                        const $ = cheerio.load(response.body);
-                        let data = $("div[data-lyrics-container|=true]");
-                        if (data.text()) {
-                            let lyrics = "";
+    const query = encodeURI(query_string).replace(" ", "+");
 
-                            data.each((i, elem) => {
-                                lyrics += cheerio.load(cheerio.load(elem).html().replace(/<br>/gi, "\n")).text();
-                                lyrics += "\n";
-                            });
+    const genius_search = await fetch("https://genius.com/api/search/song?page=1&q=" + query)
+        .then((response) => { return response.json(); })
+        .catch((error) => { return error.message ? error : new Error(error); });
+    if (genius_search instanceof Error)
+        return genius_search;
 
-                            resolve(lyrics);
-                        } else {
-                            var mm = "https://www.musixmatch.com/search/" + q;
-                            got(mm, {
-                                headers: {
-                                    "Host": "www.musixmatch.com",
-                                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                                    "Accept-Language": "en-US,en;q=0.5",
-                                    "Accept-Encoding": "gzip, deflate, br",
-                                    "Referer": "https://www.musixmatch.com/",
-                                    "Connection": "keep-alive",
-                                    "Upgrade-Insecure-Requests": "1",
-                                    "DNT": "1",
-                                    "Cache-Control": "max-age=0"
-                                }
-                            }).then((response) => {
-                                var $ = cheerio.load(response.body);
-                                if (!$(".media-card-title a")[0])
-                                    reject("There was no data available for your query. (Make sure you spelled the query correctly)");
+    if (genius_search.response.sections[0].hits[0]) {
+        const genius_result = await fetch("https://genius.com" + genius_search.response.sections[0].hits[0].result.path)
+            .then((response) => { return response.text(); })
+            .catch((error) => { return error.message ? error : new Error(error); });
+        if (genius_result instanceof Error)
+            return genius_result;
 
-                                var mm2 = "https://www.musixmatch.com" + $(".media-card-title a")[0].attribs.href;
-                                got(mm2, {
-                                    headers: {
-                                        "Host": "www.musixmatch.com",
-                                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                                        "Accept-Language": "en-US,en;q=0.5",
-                                        "Accept-Encoding": "gzip, deflate, br",
-                                        "Referer": mm,
-                                        "Connection": "keep-alive",
-                                        "Upgrade-Insecure-Requests": "1",
-                                        "DNT": "1",
-                                        "Cache-Control": "max-age=0",
-                                        "TE": "Trailers"
-                                    }
-                                }).then((response) => {
-                                    var $ = cheerio.load(response.body);
-                                    if ($(".mxm-lyrics .lyrics__content__ok")) {
-                                        var lyrics = $(".mxm-lyrics .lyrics__content__ok").text();
-                                        resolve(lyrics);
-                                    } else {
-                                        reject("There was no data available for your query. (Make sure you spelled the query correctly)");
-                                    }
-                                })
-                            }).catch((e) => {
-                                reject(e);
-                            })
-                        }
-                    }).catch((e) => {
-                        reject(e);
-                    })
-                }, 1500);
-            } else {
-                var d = "https://www.musixmatch.com/search/" + q;
-                got(d, {
-                    headers: {
-                        "Host": "www.musixmatch.com",
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                        "Accept-Language": "en-US,en;q=0.5",
-                        "Accept-Encoding": "gzip, deflate, br",
-                        "Referer": "https://www.musixmatch.com/",
-                        "Connection": "keep-alive",
-                        "Upgrade-Insecure-Requests": "1",
-                        "DNT": "1",
-                        "Cache-Control": "max-age=0"
-                    }
-                }).then((response) => {
-                    var $ = cheerio.load(response.body);
-                    if (!$(".media-card-title a")[0]))
-                        reject("There were no results for your query. (Make sure you spelled the query correctly)");
+        const elements = cheerio.load(genius_result)("div[data-lyrics-container|=true]");
+        if (elements.text()) {
+            let lyrics = "";
+            elements.each((_, elem) => {
+                lyrics += cheerio.load(cheerio.load(elem).html().replace(/<br>/gi, "\n")).text();
+                lyrics += "\n";
+            });
+            return lyrics;
+        }
+    }
 
-                    var mm2 = "https://www.musixmatch.com" + $(".media-card-title a")[0].attribs.href;
-                    got(mm2, {
-                        headers: {
-                            "Host": "www.musixmatch.com",
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0",
-                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                            "Accept-Language": "en-US,en;q=0.5",
-                            "Accept-Encoding": "gzip, deflate, br",
-                            "Referer": d,
-                            "Connection": "keep-alive",
-                            "Upgrade-Insecure-Requests": "1",
-                            "DNT": "1",
-                            "Cache-Control": "max-age=0",
-                            "TE": "Trailers"
-                        }
-                    }).then((response) => {
-                        var $ = cheerio.load(response.body);
-                        if ($(".mxm-lyrics .lyrics__content__ok")) {
-                            var lyrics = $(".mxm-lyrics .lyrics__content__ok").text();
-                            resolve(lyrics);
-                        } else {
-                            reject("There was no data available for your query. (Make sure you spelled the query correctly)");
-                        }
-                    });
-                }).catch((e) => {
-                    reject(e);
-                });
-            }
-        });
-    });
+    const musix_search = await fetch("https://www.musixmatch.com/search/" + query)
+        .then((response) => { return response.text(); })
+        .catch((error) => { return error.message ? error : new Error(error); });
+    if (musix_search instanceof Error)
+        return musix_search;
+
+    const musix_first_element = cheerio.load(musix_search)(".media-card-title a")[0];
+    if (musix_first_element) {
+        const musix_result = await fetch("https://www.musixmatch.com" + musix_first_element.attribs.href)
+            .then((response) => { return response.text(); })
+            .catch((error) => { return error.message ? error : new Error(error); });
+        if (musix_result instanceof Error)
+            return musix_result;
+
+        const lyrics = cheerio.load(musix_result)(".mxm-lyrics .lyrics__content__ok");
+        if (lyrics)
+            return lyrics.text();
+    }
+
+    return new Error(`Could not find lyrics for: "${query_string}"`);
 }

@@ -20,12 +20,13 @@ If the scraper fails on Genius, it falls back to MusixMatch.
 This code gets the lyrics of ``I Just Wanna Shine`` by ``Fitz and The Tantrums``.
 
 ```js
-import * as ftl from "../dist/index.js";
+import { find_lyrics } from "@brandon-doornbos/findthelyrics";
 
-var q = "Fitz and The Tantrums I Just Wanna Shine";
-
-ftl.find(q).then((data) => {
-    console.log(data);
+const lyrics = await find_lyrics("Fitz and The Tantrums I Just Wanna Shine");
+if (lyrics instanceof Error) {
+    console.error(lyrics);
+} else {
+    console.log(lyrics);
     // [Chorus]
     // I just wanna shine like the sun when it comes up
     // Run the city from the rooftops
@@ -33,7 +34,7 @@ ftl.find(q).then((data) => {
     // I just wanna climb to the top of a mountain
     // Standing tall when I'm howlin'
     // ...
-}).catch((error) => {
-    console.error(error);
-});
+}
 ```
+
+P.S. It uses [fetch from the core NodeJS API](https://github.com/nodejs/node/pull/41749) which currently requires the `--experimental-fetch` flag under node.
