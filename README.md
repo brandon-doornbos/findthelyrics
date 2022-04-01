@@ -1,7 +1,7 @@
 # findthelyrics
 NPM package to find lyrics to any given song.
 
-[NPMJS](https://www.npmjs.com/package/findthelyrics) Package | [Github](https://github.com/n0rmancodes/findthelyrics) Repo
+[NPMJS](https://www.npmjs.com/package/@brandon-doornbos/findthelyrics) Package | [Github](https://github.com/brandon-doornbos/findthelyrics) Repo
 
 # Disclaimer 
 Although the code is not licensed, the lyrics are highly likely to be licensed by the respective record label.
