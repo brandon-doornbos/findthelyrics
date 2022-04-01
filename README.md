@@ -1,7 +1,7 @@
 # findthelyrics
 NPM package to find lyrics to any given song.
 
-[NPMJS](https://www.npmjs.com/package/@brandon-doornbos/findthelyrics) Package | [Github](https://github.com/brandon-doornbos/findthelyrics) Repo
+[NPMJS](https://www.npmjs.com/package/@brandond/findthelyrics) Package | [Github](https://github.com/brandon-doornbos/findthelyrics) Repo
 
 # Disclaimer 
 Although the code is not licensed, the lyrics are highly likely to be licensed by the respective record label.
@@ -20,7 +20,7 @@ If the scraper fails on Genius, it falls back to MusixMatch.
 This code gets the lyrics of ``I Just Wanna Shine`` by ``Fitz and The Tantrums``.
 
 ```js
-import { find_lyrics } from "@brandon-doornbos/findthelyrics";
+import { find_lyrics } from "@brandond/findthelyrics";
 
 const lyrics = await find_lyrics("Fitz and The Tantrums I Just Wanna Shine");
 if (lyrics instanceof Error) {
