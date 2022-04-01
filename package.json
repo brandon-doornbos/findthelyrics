@@ -1,6 +1,6 @@
 {
   "name": "@brandond/findthelyrics",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Find the lyrics of any given song using the power of scraping!",
   "main": "index.js",
   "type": "module",
