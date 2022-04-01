@@ -6,7 +6,7 @@ NPM package to find lyrics to any given song.
 # Disclaimer 
 Although the code is not licensed, the lyrics are highly likely to be licensed by the respective record label.
 
-To programically check the record label of the song, use [Discogs API](https://www.discogs.com/developers/).
+To programmatically check the record label of the song, use [Discogs API](https://www.discogs.com/developers/).
 
 I take no responsibility for the actions used with the code.
 
