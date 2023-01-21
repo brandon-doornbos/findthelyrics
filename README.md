@@ -37,4 +37,3 @@ if (lyrics instanceof Error) {
 }
 ```
 
-P.S. It uses [fetch from the core NodeJS API](https://github.com/nodejs/node/pull/41749) which currently requires the `--experimental-fetch` flag under node.
