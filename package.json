@@ -1,6 +1,6 @@
 {
   "name": "@brandond/findthelyrics",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Find the lyrics of any given song using the power of scraping!",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,12 +25,12 @@
   },
   "homepage": "https://github.com/brandon-doornbos/findthelyrics#readme",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.10"
+    "cheerio": "^1.0.0-rc.12"
   },
   "directories": {
     "test": "test"
   },
   "devDependencies": {
-    "typescript": "^4.6.3"
+    "typescript": "^4.9.4"
   }
 }
